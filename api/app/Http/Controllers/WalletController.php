@@ -82,4 +82,43 @@ class WalletController extends Controller
             return response()->json(['balance' => 0, 'status' => "Insufficient balance, please top up"], 200);
         }
     }
+
+    public function findSecondLargest(Request $request)
+    {
+        $request->validate([
+            'numbers' => 'required|array|min:2',
+            'numbers.*' => 'numeric',
+        ]);
+
+        $arr = $request->input('numbers');
+
+
+        $secondLargest = $this->getSecondLargest($arr);
+
+        // Return the result as a JSON response
+        return response()->json([
+            'second_largest' => $secondLargest
+        ]);
+    }
+
+    /**
+     * Logic to find the second largest number in the array.
+     */
+    private function getSecondLargest($arr)
+    {
+        $largest = PHP_INT_MIN;
+        $secondLargest = PHP_INT_MIN;
+
+        foreach ($arr as $num) {
+            if ($num > $largest) {
+                $secondLargest = $largest;
+                $largest = $num;
+            } elseif ($num > $secondLargest && $num < $largest) {
+                $secondLargest = $num;
+            }
+        }
+
+        // If second largest is still PHP_INT_MIN, return null (no valid second largest)
+        return ($secondLargest === PHP_INT_MIN) ? null : $secondLargest;
+    }
 }
